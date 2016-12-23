@@ -2,17 +2,8 @@
 
 import os
 import pyowm
+import json
 from apiai_webhook import Application, WebHookAnswer, WebHookRequest
-
-
-def temperature_view(req):
-    city = req.result.parameters.get("geo-city")
-    temperature = _get_temperature(city)
-    if not temperature:
-        return WebHookAnswer()
-    print("TEMPERATURE: ", city, temperature)
-    speech = "{0}C - {1}C".format(temperature[0], temperature[1])
-    return WebHookAnswer(speech=speech, display_text=speech)
 
 
 def _owm():
@@ -31,6 +22,48 @@ def _get_temperature(city):
     if not temperature:
         return None
     return temperature['temp_min'], temperature['temp_max']
+
+
+def _get_conditions(city):
+    observation = _owm().weather_at_place(city)
+    if not observation:
+        return None
+    weather = observation.get_weather()
+    if not weather:
+        return None
+    weather_info = {
+        "clouds": weather.get_clouds(),
+        "rain": weather.get_rain(),
+        "snow": weather.get_snow(),
+        "wind": weather.get_wind(),
+        "humidity": weather.get_humidity(),
+        "pressure": weather.get_pressure(),
+        "status": weather.get_status()
+    }
+    return weather_info
+
+
+def temperature_view(req):
+    city = req.result.parameters.get("geo-city")
+    temperature = _get_temperature(city)
+    if not temperature:
+        return WebHookAnswer()
+    print("TEMPERATURE: ", city, temperature)
+    if int(temperature[0]) != int(temperature[1]):
+        speech = "{0}C - {1}C".format(temperature[0], temperature[1])
+    else:
+        speech = "{0}C".format(temperature[0])
+    return WebHookAnswer(speech=speech, display_text=speech)
+
+
+def conditions_view(req):
+    city = req.result.parameters.get("geo-city")
+    conditions = _get_conditions(city)
+    if not conditions:
+        return WebHookAnswer()
+    print("CONDITIONS: ", city, conditions)
+    speech = json.dumps(conditions, ensure_ascii=False)
+    return WebHookAnswer(speech=speech, display_text=speech)
 
 
 #def make_webhook_result(data):
@@ -72,7 +105,7 @@ def _get_temperature(city):
 
 if __name__ == '__main__':
     application = Application("/webhook", {
-        "condition": [temperature_view]
+        "condition": [conditions_view]
     })
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port {0}".format(port))
