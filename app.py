@@ -16,7 +16,7 @@ def webhook():
     req = request.get_json(silent=True, force=True)
     print("Request:")
     print(json.dumps(req, indent=4))
-    res = process_request(WebHookRequest(req))
+    res = process_request(WebHookRequest(req)).as_dict
     res = json.dumps(res, indent=4)
     r = make_response(res)
     r.headers['Content-Type'] = 'application/json'
@@ -25,11 +25,11 @@ def webhook():
 
 def process_request(req):
     if req.result.action != "yahooWeatherForecast":
-        return {}
+        return WebHookAnswer()
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
     yql_query = make_yql_query(req)
     if yql_query is None:
-        return {}
+        return WebHookAnswer()
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
     result = urlopen(yql_url).read()
     data = json.loads(result)
@@ -74,7 +74,6 @@ def make_webhook_result(data):
 
 
 if __name__ == '__main__':
-
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port {0}".format(port))
     app.run(debug=False, port=port, host='0.0.0.0')
