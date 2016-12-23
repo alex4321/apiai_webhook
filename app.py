@@ -5,11 +5,14 @@ import pyowm
 from apiai_webhook import Application, WebHookAnswer, WebHookRequest
 
 
-def temperature(req):
+def temperature_view(req):
     city = req.result.parameters.get("geo-city")
     temperature = _get_temperature(city)
+    if not temperature:
+        return WebHookAnswer()
     print("TEMPERATURE: ", city, temperature)
-    return WebHookAnswer()
+    speech = "{0}C - {1}C".format(temperature[0], temperature[1])
+    return WebHookAnswer(speech=speech, display_text=speech)
 
 
 def _owm():
@@ -19,8 +22,14 @@ def _owm():
 
 def _get_temperature(city):
     observation = _owm().weather_at_place(city)
+    if not observation:
+        return None
     weather = observation.get_weather()
+    if not weather:
+        return None
     temperature = weather.get_temperature('celsius')
+    if not temperature:
+        return None
     return temperature['temp_min'], temperature['temp_max']
 
 
@@ -63,7 +72,7 @@ def _get_temperature(city):
 
 if __name__ == '__main__':
     application = Application("/webhook", {
-        "condition": [temperature]
+        "condition": [temperature_view]
     })
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port {0}".format(port))
