@@ -31,13 +31,13 @@ def make_yql_query(req):
 def make_webhook_result(data):
     query = data.get('query')
     if query is None:
-        return {}
+        return WebHookAnswer()
     result = query.get('results')
     if result is None:
-        return {}
+        return WebHookAnswer()
     channel = result.get('channel')
     if channel is None:
-        return {}
+        return WebHookAnswer()
     item = channel.get('item')
     location = channel.get('location')
     units = channel.get('units')

@@ -47,7 +47,7 @@ class Application(object):
         if self._debug:
             print("Answer:")
             print(json.dumps(request_dict, indent=4))
-        response = make_response(result_dict)
+        response = make_response(json.dumps(result_dict))
         response.headers['Content-Type'] = 'application/json'
         return response
 
