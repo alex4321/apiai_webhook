@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import pyowm
-from apiai_webhook import Application, WebHookAnswer, WebHookRequest
+from apiai_webhook import Application, WebHookAnswer
 
 
 def _owm():
