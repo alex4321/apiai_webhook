@@ -37,6 +37,8 @@ class Application(object):
             print("Request:")
             print(json.dumps(request_dict, indent=4))
         req = WebHookRequest(request_dict)
+        if req.result.action != "" and self._debug:
+            print("Action: ", req.result.action)
         handlers = self._action_handlers(req.result.action)
         result_dict = {}
         for handler in handlers:
