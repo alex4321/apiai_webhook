@@ -4,25 +4,7 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 import json
 import os
-from flask import Flask, request, make_response
-from apiai_webhook import WebHookAnswer
-from apiai_webhook import WebHookRequest
-app = Flask(__name__)
-
-
-# noinspection PyPackageRequirements
-@app.route('/webhook', methods=['POST'])
-def webhook():
-    print("Webhook")
-    req = request.get_json(silent=True, force=True)
-    print("Request:")
-    print(json.dumps(req, indent=4))
-    res = process_request(WebHookRequest(req)).as_dict
-    res = json.dumps(res, indent=4)
-    r = make_response(res)
-    r.headers['Content-Type'] = 'application/json'
-    return r
-
+from apiai_webhook import Application, WebHookAnswer, WebHookRequest
 
 def process_request(req):
     print("ACTION : ", req.result.action)
@@ -76,6 +58,9 @@ def make_webhook_result(data):
 
 
 if __name__ == '__main__':
+    application = Application("/webhook", {
+        "condition": process_request
+    })
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port {0}".format(port))
-    app.run(debug=False, port=port, host='0.0.0.0')
+    application.run('0.0.0.0', port, True)
