@@ -31,7 +31,7 @@ class Application(object):
             handlers += self.handlers.get(handler_key, [])
         return handlers
 
-    def handler(self):
+    def _handler(self):
         request_dict = request.get_json(silent=True, force=True)
         if self._debug:
             print("Request:")
@@ -53,11 +53,10 @@ class Application(object):
         response.headers['Content-Type'] = 'application/json'
         return response
 
-
     def run(self, host='0.0.0.0', port=5000, debug=True):
         @self.flask.route(self.route, methods=['POST'])
         def _webhook():
-            return self.handler()
+            return self._handler()
 
         self._debug = debug
         self.flask.run(host, port, debug)
