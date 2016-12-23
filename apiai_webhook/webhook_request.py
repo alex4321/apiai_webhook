@@ -1,6 +1,13 @@
 from .webhook_context import Context
 
 
+def _get(src, key, default):
+    if src.get(key) is not None:
+        return src.get(key)
+    else:
+        return default
+
+
 class OriginalRequest(object):
     def __init__(self, request):
         """
@@ -8,16 +15,16 @@ class OriginalRequest(object):
         :param request: request
         :type request: dict
         """
-        self.source = request.get("source", "")
-        data = request.get("data", {})
-        self.text = data.get("text", "")
-        self.match = data.get("match", [])
-        self.type = data.get("type", "")
-        self.event = data.get("event", "")
-        self.team = data.get("team", "")
-        self.user = data.get("user", "")
-        self.channel = data.get("channel", "")
-        self.ts = data.get("ts", "")
+        self.source = _get(request, "source", "")
+        data = _get(request, "data", {})
+        self.text = _get(data, "text", "")
+        self.match = _get(data, "match", [])
+        self.type = _get(data, "type", "")
+        self.event = _get(data, "event", "")
+        self.team = _get(data, "team", "")
+        self.user = _get(data, "user", "")
+        self.channel = _get(data, "channel", "")
+        self.ts = _get(data, "ts", "")
         super(OriginalRequest, self).__init__()
 
 
@@ -40,16 +47,16 @@ class Result(object):
         :param result: result
         :type result: dict
         """
-        self.speech = result.get("speech")
-        self.score = result.get("score", 1.0)
-        self.source = result.get("source", "")
-        self.action = result.get("action", "")
-        self.resolved_query = result.get("resolvedQuery", "")
-        self.action_incomplete = result.get("actionIncomplete", False)
+        self.speech = _get(result, "speech", "")
+        self.score = _get(result, "score", 1.0)
+        self.source = _get(result,"source", "")
+        self.action = _get(result, "action", "")
+        self.resolved_query = _get(result, "resolvedQuery", "")
+        self.action_incomplete = _get(result, "actionIncomplete", False)
         self.contexts = [Context(context) for context in result.get("contexts", [])]
-        self.parameters = result.get("parameters", {})
-        self.metadata = result.get("metadata", {})
-        fulfillment = result.get("fulfillment", {})
+        self.parameters = _get(result, "parameters", {})
+        self.metadata = _get(result, "metadata", {})
+        fulfillment = _get(result, "fulfillment", {})
         self.fulfillment_speech = fulfillment.get("speech", "")
         self.fulfillment_messages = [Message(message)
                                      for message in fulfillment.get("messages", [])]
@@ -63,8 +70,8 @@ class RequestStatus(object):
         :param status: status
         :type status: dict
         """
-        self.error_type = status.get("errorType", "success")
-        self.code = status.get("code", 200)
+        self.error_type = _get(status, "errorType", "success")
+        self.code = _get(status, "code", 200)
         super(RequestStatus, self).__init__()
 
 
@@ -75,10 +82,10 @@ class WebHookRequest(object):
         :param request: request
         :type request: dict
         """
-        self.original_request = OriginalRequest(request.get("originalRequest", {}))
-        self.timestamp = request.get("timestamp", "")
-        self.result = Result(request.get("result", {}))
-        self.session_id = request.get("sessionId", "")
-        self.id = request.get("id", "")
-        self.status = RequestStatus(request.get("status", {}))
+        self.original_request = OriginalRequest(_get(request, "originalRequest", {}))
+        self.timestamp = _get(request, "timestamp", "")
+        self.result = Result(_get(request, "result", {}))
+        self.session_id = _get(request, "sessionId", "")
+        self.id = _get(request, "id", "")
+        self.status = RequestStatus(_get(request, "status", {}))
         super(WebHookRequest, self).__init__()
