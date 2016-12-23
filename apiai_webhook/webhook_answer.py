@@ -23,9 +23,14 @@ class WebHookAnswer(object):
 
     @property
     def as_dict(self):
-        return {
-            "speech": self.speech,
-            "displayText": self.display_text,
-            "contextOut": [item.as_dict for item in self.context_out],
-            "source": self.source
-        }
+        if self.speech == "" and self.display_text == "" and \
+           self.data == {} and self.context_out == [] and \
+           self.source == "":
+            return {}
+        else:
+            return {
+                "speech": self.speech,
+                "displayText": self.display_text,
+                "contextOut": [item.as_dict for item in self.context_out],
+                "source": self.source
+            }
