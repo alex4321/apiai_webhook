@@ -13,6 +13,7 @@ def process_request(req):
     if yql_query is None:
         return WebHookAnswer()
     yql_url = baseurl + urlencode({'q': yql_query}) + "&format=json"
+    print("Query URL : " + yql_url)
     result = urlopen(yql_url).read().decode('utf8')
     data = json.loads(result)
     res = make_webhook_result(data)
