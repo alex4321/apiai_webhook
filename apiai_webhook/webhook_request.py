@@ -2,8 +2,9 @@ from .webhook_context import Context
 
 
 def _get(src, key, default):
-    if src.get(key) is not None:
-        return src.get(key)
+    val = src.get(key)
+    if val is not None:
+        return val
     else:
         return default
 
@@ -35,8 +36,8 @@ class Message(object):
         :param message: message
         :type message: dict
         """
-        self.speech = message.get("speech", "")
-        self.type = message.get("type", 0)
+        self.speech = _get(message, "speech", "")
+        self.type = _get(message, "type", 0)
         super(Message, self).__init__()
 
 
@@ -53,13 +54,13 @@ class Result(object):
         self.action = _get(result, "action", "")
         self.resolved_query = _get(result, "resolvedQuery", "")
         self.action_incomplete = _get(result, "actionIncomplete", False)
-        self.contexts = [Context(context) for context in result.get("contexts", [])]
+        self.contexts = [Context(context) for context in _get(result, "contexts", [])]
         self.parameters = _get(result, "parameters", {})
         self.metadata = _get(result, "metadata", {})
         fulfillment = _get(result, "fulfillment", {})
-        self.fulfillment_speech = fulfillment.get("speech", "")
+        self.fulfillment_speech = _get(fulfillment, "speech", "")
         self.fulfillment_messages = [Message(message)
-                                     for message in fulfillment.get("messages", [])]
+                                     for message in _get(fulfillment, "messages", [])]
         super(Result, self).__init__()
 
 
