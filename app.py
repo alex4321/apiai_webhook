@@ -25,6 +25,7 @@ def webhook():
 
 
 def process_request(req):
+    print("ACTION : ", req.result.action)
     if req.result.action != "yahooWeatherForecast":
         return WebHookAnswer()
     baseurl = "https://query.yahooapis.com/v1/public/yql?"
