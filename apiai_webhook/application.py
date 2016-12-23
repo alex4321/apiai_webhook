@@ -11,7 +11,7 @@ class Application(object):
         :param route: route to webhook
         :type route: str
         :param handlers: action handlers
-        :type handlers: dict[str, (WebHookRequest)->WebHookAnswer]
+        :type handlers: dict[str, list[(WebHookRequest)->WebHookAnswer]]
         """
         self.route = route
         self.flask = Flask(__name__)

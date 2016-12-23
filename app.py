@@ -59,7 +59,7 @@ def make_webhook_result(data):
 
 if __name__ == '__main__':
     application = Application("/webhook", {
-        "condition": process_request
+        "condition": [process_request]
     })
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port {0}".format(port))
