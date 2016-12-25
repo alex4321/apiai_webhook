@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
 import pyowm
-from apiai_webhook import Application, WebHookAnswer
+import json
+from apiai_webhook import Application, WebHookAnswer, WebHookRequest
 
 
 def _owm():
@@ -42,6 +43,13 @@ def _get_conditions(city):
 
 
 def temperature_view(req):
+    """
+    "Temperature" action
+    :param req: request
+    :type req: WebHookRequest
+    :return: answer
+    :rtype: WebHookAnswer
+    """
     city = req.result.parameters.get("geo-city")
     temperature = _get_temperature(city)
     if not temperature:
@@ -55,6 +63,13 @@ def temperature_view(req):
 
 
 def conditions_view(req):
+    """
+    "Conditions" action
+    :param req: request
+    :type req: WebHookRequest
+    :return: answer
+    :rtype: WebHookAnswer
+    """
     city = req.result.parameters.get("geo-city")
     conditions = _get_conditions(city)
     if not conditions:
@@ -64,10 +79,23 @@ def conditions_view(req):
     return WebHookAnswer(speech=speech, display_text=speech)
 
 
+def log_view(req):
+    """
+    "Log" action
+    :param req: request
+    :type req: WebHookRequest
+    :return: answer
+    :rtype: WebHookAnswer
+    """
+    print(json.dumps(req.as_dict, ensure_ascii=False, indent=4))
+    return WebHookAnswer()
+
+
 if __name__ == '__main__':
     application = Application("/webhook", {
         "temperature": [temperature_view],
         "conditions": [conditions_view],
+        "": [log_view],
     })
     port = int(os.getenv('PORT', 5000))
     print("Starting app on port {0}".format(port))
