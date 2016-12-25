@@ -27,7 +27,7 @@ class Application(object):
         :rtype: list[(WebHookRequest)->WebHookAnswer]
         """
         handlers = []
-        for handler_key in [action, ""]:
+        for handler_key in ["", action]:
             handlers += self.handlers.get(handler_key, [])
         return handlers
 
