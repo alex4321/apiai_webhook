@@ -28,6 +28,20 @@ class OriginalRequest(object):
         self.ts = _get(data, "ts", "")
         super(OriginalRequest, self).__init__()
 
+    @property
+    def as_dict(self):
+        return {
+            "source": self.source,
+            "text": self.text,
+            "match": self.match,
+            "type": self.type,
+            "event": self.event,
+            "team": self.team,
+            "user": self.user,
+            "channel": self.channel,
+            "ts": self.ts
+        }
+
 
 class Message(object):
     def __init__(self, message):
@@ -39,6 +53,13 @@ class Message(object):
         self.speech = _get(message, "speech", "")
         self.type = _get(message, "type", 0)
         super(Message, self).__init__()
+
+    @property
+    def as_dict(self):
+        return {
+            "speech": self.speech,
+            "type": self.type
+        }
 
 
 class Result(object):
@@ -63,6 +84,28 @@ class Result(object):
                                      for message in _get(fulfillment, "messages", [])]
         super(Result, self).__init__()
 
+    @property
+    def as_dict(self):
+        return {
+            "speech": self.speech,
+            "score": self.score,
+            "source": self.source,
+            "action": self.action,
+            "resolved_query": self.resolved_query,
+            "action_incomplete": self.action_incomplete,
+            "contexts": [
+                context.as_dict
+                for context in self.contexts
+            ],
+            "parameters": self.parameters,
+            "metadata": self.metadata,
+            "fulfillment_speech": self.fulfillment_speech,
+            "fulfillment_messages": [
+                message.as_dict
+                for message in self.fulfillment_messages
+            ]
+        }
+
 
 class RequestStatus(object):
     def __init__(self, status):
@@ -74,6 +117,13 @@ class RequestStatus(object):
         self.error_type = _get(status, "errorType", "success")
         self.code = _get(status, "code", 200)
         super(RequestStatus, self).__init__()
+
+    @property
+    def as_dict(self):
+        return {
+            "error_type": self.error_type,
+            "code": self.code
+        }
 
 
 class WebHookRequest(object):
@@ -90,3 +140,14 @@ class WebHookRequest(object):
         self.id = _get(request, "id", "")
         self.status = RequestStatus(_get(request, "status", {}))
         super(WebHookRequest, self).__init__()
+
+    @property
+    def as_dict(self):
+        return {
+            "original_request": self.original_request.as_dict,
+            "timestamp": self.timestamp,
+            "result": self.result.as_dict,
+            "session_id": self.session_id,
+            "id": self.id,
+            "status": self.status.as_dict
+        }
