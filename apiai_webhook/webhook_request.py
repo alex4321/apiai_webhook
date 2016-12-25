@@ -75,7 +75,8 @@ class Result(object):
         self.action = _get(result, "action", "")
         self.resolved_query = _get(result, "resolvedQuery", "")
         self.action_incomplete = _get(result, "actionIncomplete", False)
-        self.contexts = [Context(context) for context in _get(result, "contexts", [])]
+        self.contexts = [Context.from_dict(context)
+                         for context in _get(result, "contexts", [])]
         self.parameters = _get(result, "parameters", {})
         self.metadata = _get(result, "metadata", {})
         fulfillment = _get(result, "fulfillment", {})
